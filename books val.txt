@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Book</title>
+</head>
+<body>
+    <h2>Add Book to Library</h2>
+    <form action="/add-book" method="post" onsubmit="return validateForm()">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+        <br>
+
+        <label for="author">Author:</label>
+        <input type="text" id="author" name="author" required>
+        <br>
+
+        <label for="year">Publication Year:</label>
+        <input type="number" id="year" name="year" min="1800" max="2099" required>
+        <br>
+
+        <label for="isbn">ISBN:</label>
+        <input type="text" id="isbn" name="isbn" required>
+        <br>
+
+        <input type="submit" value="Add Book">
+    </form>
+
+    <script>
+        function validateForm() {
+            var title = document.getElementById("title").value;
+            var author = document.getElementById("author").value;
+            var year = document.getElementById("year").value;
+            var isbn = document.getElementById("isbn").value;
+
+            if (title.trim() === "") {
+                alert("Please enter the book's title.");
+                return false;
+            }
+
+            if (author.trim() === "") {
+                alert("Please enter the book's author.");
+                return false;
+            }
+
+            if (year < 1800 || year > 2099) {
+                alert("Please enter a valid publication year between 1800 and 2099.");
+                return false;
+            }
+
+            if (isbn.trim() === "") {
+                alert("Please enter the book's ISBN.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>

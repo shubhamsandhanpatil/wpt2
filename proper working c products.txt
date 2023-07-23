@@ -1,0 +1,117 @@
+const mysql=require("mysql")
+
+var mysqlconnection=mysql.createConnection({
+    "host":"127.0.0.1",
+    "user":"root",
+    "password":"root123",
+    "database":"exam",
+    "port":"3306"
+})
+
+mysqlconnection.connect((err)=>{
+if(err){
+    console.log("error occured in database"+JSON.stringify)
+}
+else{
+    console.log("your database connection sucessfully connected")
+}
+
+})
+
+module.exports=mysqlconnection;
+
+
+-------------
+
+
+const express=require('express')
+const router=express.Router();
+const  connection=require('../db/dbconnect')
+
+
+router.get("/products",(req,resp)=>{
+connection.query("select * from products",(err,data)=>{
+if(err){
+    resp.status(500).send("error occured",JSON.stringify)
+}
+else{
+    resp.send(data)
+}
+})
+})
+
+router.get("/products/:pid",(req,resp)=>{
+    connection.query("select * from products where pid=?",[req.params.pid],(err,data)=>{
+        if(err){
+            resp.status(500).send("error occured"+JSON.stringify(err))
+        }
+        else{
+            resp.send(data[0])
+        }
+    })
+})
+
+router.delete("/products/delete/:pid",(req,resp)=>{
+    connection.query("delete from products where pid=?",[req.params.pid],(err,data)=>{
+        if(err){
+            resp.status(500).send("error occured"+JSON.stringify(err))
+        }
+        else{
+            resp.send("products deleted sucessfully")
+        }
+    })
+})
+
+router.post("/products/add",(req,resp)=>{
+    var pid=req.body.pid;
+    var pname=req.body.pname;
+    var price=req.body.price;
+    connection.query("insert into products values(?,?,?)",[pid,pname,price],(err,data)=>{
+        if(err){
+            resp.status(500).send("product not added"+JSON.stringify(err))
+        }else{
+            resp.send("inserted data sucessfully")
+        }
+    })
+})
+
+router.put("/products/update/:pid",(req,resp)=>{
+    
+    var pid=req.body.pid
+    var pname=req.body.pname;
+    var price=req.body.price;
+    connection.query("update products set pname=?,price=? where pid=?",[pname,price,pid],(err,data)=>{
+        if(err){
+            resp.status(500).send("products not updated"+JSON.stringify(err))
+        }else{
+            
+            resp.send("updated sucessfully")
+
+        }
+    })
+   
+})
+module.exports=router;
+
+
+------------------
+
+
+
+const express=require("express");
+const app=express();
+const bodyparser=require("body-parser");
+const router=require("./router/router")
+
+app.use(bodyparser.urlencoded({extended:false}))
+app.use(bodyparser.json())
+
+
+app.use("/",router);
+
+
+app.listen(3004,function(){
+    console.log("your port is running on 3004")
+})
+
+module.exports=app;

@@ -1,0 +1,136 @@
+fold:ExpressJs           |javascript ES6
+npm init ---yes          |css peek
+npm install express      |autoclose tag
+npm intsall mysql        |prettier code formatter
+npm install ejs          |path intelliscence
+status;                  |live sever
+vsc                      |auto rename tag
+----------------------------------------------------------------------------------------
+folder :db
+file:dbconnect.js
+
+const mysql=require("mysql")
+
+var mysqlconnection=mysql.createConnection({
+    "host":"127.0.0.1",
+    "user":"root",
+    "password":"admin@123",
+    "database":"prash",
+    "port":"3306"
+})
+
+mysqlconnection.connect((err)=>{
+if(err){
+    console.log("error occured in database"+JSON.stringify)
+}
+else{
+    console.log("your database connection sucessfully connected")
+}
+
+})
+
+module.exports=mysqlconnection;
+-----------------------------------------------------------------------------------------
+Folder:router
+file:router.js
+
+const express=require('express')
+const router=express.Router();
+const  connection=require('../db/dbconnect')
+
+
+router.get("/products",(req,resp)=>{
+connection.query("select * from products",(err,data)=>{
+if(err){
+    resp.status(500).send("error occured",JSON.stringify)
+}
+else{
+    resp.send(data)
+}
+})
+})
+
+router.get("/products/:pid",(req,resp)=>{
+    connection.query("select * from products where pid=?",[req.params.pid],(err,data)=>{
+        if(err){
+            resp.status(500).send("error occured"+JSON.stringify(err))
+        }
+        else{
+            resp.send(data[0])
+        }
+    })
+})
+
+router.delete("/products/delete/:pid",(req,resp)=>{
+    connection.query("delete from products where pid=?",[req.params.pid],(err,data)=>{
+        if(err){
+            resp.status(500).send("error occured"+JSON.stringify(err))
+        }
+        else{
+            resp.send("products deleted sucessfully")
+        }
+    })
+})
+
+router.post("/products/add",(req,resp)=>{
+    var pid=req.body.pid;
+    var pname=req.body.pname;
+    var price=req.body.price;
+    connection.query("insert into products values(?,?,?)",[pid,pname,price],(err,data)=>{
+        if(err){
+            resp.status(500).send("product not added"+JSON.stringify(err))
+        }else{
+            resp.send("data added sucessfully")
+        }
+    })
+})
+
+router.put("/products/update/:pid",(req,resp)=>{
+    
+    var pid=req.body.pid
+    var pname=req.body.pname;
+    var price=req.body.price;
+    connection.query("update products set pname=?,price=? where pid=?",[pname,price,pid],(err,data)=>{
+        if(err){
+            resp.status(500).send("products not updated"+JSON.stringify(err))
+        }else{
+            
+            resp.send("updated sucessfully")
+
+        }
+    })
+   
+})
+module.exports=router;
+
+------------------------------------------------
+const express=require("express");
+const app=express();
+const bodyparser=require("body-parser");
+const router=require("./router/router")
+
+app.use(bodyparser.urlencoded({extended:false}))
+app.use(bodyparser.json())
+
+
+app.use("/",router);
+
+
+app.listen(3004,function(){
+    console.log("your port is running on 3004")
+})
+
+module.exports=app;
+
+----------------------
+
+
+ create table products(pid int ,pname varchar(20),price double(9,2));
+
+
+ insert into products values(1,"mobile","15000"),(2,"Washing Machine","41000"),(3,"Iphone","141000"),(4,"Football","700");
+
+
+
+
+
